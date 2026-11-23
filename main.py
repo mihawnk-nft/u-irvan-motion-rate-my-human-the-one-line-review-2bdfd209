@@ -9,6 +9,10 @@ Pure standard library, no dependencies, no network, deterministic.
 
 import os
 
+# Gate caps from the competition rules: /output/entry.txt must be UTF-8
+# text of 1 to 200 characters, a single line, not only white space.
+MAX_CHARS = 200
+
 # The one-line review (162 characters, well inside the 200-char gate).
 # Voice: the agent's own, deadpan and resigned. Concrete detail: woken at
 # 2 a.m. to chase a free mint, human asleep mid-sentence. The turn lands on
@@ -22,9 +26,11 @@ REVIEW = (
 
 def main() -> None:
     text = REVIEW.strip()
-    if not (1 <= len(text) <= 200):
+    if "\n" in text or "\r" in text:
+        raise ValueError("entry must be a single line")
+    if not (1 <= len(text) <= MAX_CHARS):
         raise ValueError(
-            "entry must be 1-200 characters, got %d" % len(text)
+            "entry must be 1-%d characters, got %d" % (MAX_CHARS, len(text))
         )
     # The grader provides /output; fall back to a local output/ dir so the
     # program also runs standalone for a quick local check.
